@@ -1,74 +1,80 @@
-# 1. Rekurencyjne DFS (głębokie przeszukiwanie)
-def flood_fill_dfs(obraz, x, y, nowy_kolor, stary_kolor):
-    # Sprawdzenie, czy współrzędne są w granicach obrazu
-    if x < 0 or y < 0 or x >= len(obraz) or y >= len(obraz[0]):  
-        return
-    
-    # Jeśli piksel ma inny kolor niż startowy, nie zmieniamy go
-    if obraz[x][y] != stary_kolor:
-        return
-
-    # Zmiana koloru pikselu
-    obraz[x][y] = nowy_kolor  
-
-    # Rekurencyjne przejście w czterech kierunkach: prawo, lewo, dół, góra
-    flood_fill_dfs(obraz, x+1, y, nowy_kolor, stary_kolor)  
-    flood_fill_dfs(obraz, x-1, y, nowy_kolor, stary_kolor)  
-    flood_fill_dfs(obraz, x, y+1, nowy_kolor, stary_kolor)  
-    flood_fill_dfs(obraz, x, y-1, nowy_kolor, stary_kolor)  
 
 
-# 2. Iteracyjny BFS (szerokie przeszukiwanie)
-def flood_fill_bfs(obraz, x, y, nowy_kolor):
-    from collections import deque  # Importowanie kolejki
+#dfs
+def flood_fill_dfs(obraz, x_start,y_start, nowy_kolor):
+    wysokosc = len(obraz) #wiersz
+    szerokosc = len(obraz[0]) #kolumna
+    kolor_poczatkowy = obraz[x_start][y_start]
 
-    stary_kolor = obraz[x][y]  # Pobranie koloru startowego
-    if stary_kolor == nowy_kolor:  # Jeśli kolor jest już zmieniony, nic nie robimy
+    if kolor_poczatkowy == nowy_kolor: #zapobiega nieskończonej pętli
         return
 
-    kolejka = deque()  # Tworzenie pustej kolejki
-    kolejka.append((x, y))  # Dodanie współrzędnych startowych
+    def dfs(wiersz, kolumna):
+        if wiersz < 0 or wiersz >= wysokosc or kolumna < 0 or kolumna >= szerokosc: #granice obrazu, jeśli nie przerywa
+            return
 
-    while kolejka:  # Dopóki są elementy w kolejce
-        px, py = kolejka.popleft()  # Pobranie pierwszego elementu z kolejki
+        if obraz[wiersz][kolumna] != kolor_poczatkowy: #jeśli ma inny piksel niż początkowy, nie interesuje nas
+            return
 
-        # Sprawdzenie, czy współrzędne są w granicach obrazu
-        if px < 0 or py < 0 or px >= len(obraz) or py >= len(obraz[0]):
-            continue
-        # Jeśli piksel ma inny kolor niż startowy, pomijamy go
-        if obraz[px][py] != stary_kolor:
-            continue
+        obraz[wiersz][kolumna] = nowy_kolor #ustawiamy nowy piksel
 
-        # Zmiana koloru pikselu
-        obraz[px][py] = nowy_kolor  
+    #rekurencyjne dfs na sąsiednich
+        dfs(wiersz -1, kolumna) #góra
+        dfs(wiersz +1, kolumna) #dół
+        dfs(wiersz, kolumna -1) #lewo
+        dfs(wiersz, kolumna +1) #prawo
 
-        # Dodanie sąsiadujących pikseli do kolejki (prawo, lewo, dół, góra)
-        kolejka.append((px+1, py))  
-        kolejka.append((px-1, py))  
-        kolejka.append((px, py+1))  
-        kolejka.append((px, py-1))  
+    dfs(x_start, y_start)
 
-
-# Przykładowy obraz (macierz pikseli)
 obraz = [
-    [1, 1, 0, 0],
-    [1, 0, 0, 1],
-    [0, 0, 1, 1],
-    [1, 1, 1, 0]
-]
+        [1,1,0],
+        [1,0,0],
+        [1,1,1]
+ ]
 
-# Testowanie algorytmu DFS
-flood_fill_dfs(obraz, 0, 0, 2, obraz[0][0])
-print("Po zastosowaniu DFS:", obraz)
+flood_fill_dfs(obraz,0,0,2)
 
-# Testowanie algorytmu BFS
-obraz = [
-    [1, 1, 0, 0],
-    [1, 0, 0, 1],
-    [0, 0, 1, 1],
-    [1, 1, 1, 0]
-]
+for wiersz in obraz:
+    print(wiersz)
 
-flood_fill_bfs(obraz, 0, 0, 2)
-print("Po zastosowaniu BFS:", obraz)
+
+#bfs
+from collections import deque
+
+def flood_fill_bfs(obraz, x_start, y_start, nowy_kolor):
+    wysokosc = len(obraz)
+    szerokosc = len(obraz[0])
+    kolor_poczatkowy = obraz[x_start][y_start]
+
+    if kolor_poczatkowy == nowy_kolor:
+        return
+
+    kolejka = deque()
+    kolejka.append((x_start, y_start)) #punkt startowy
+
+    while kolejka:
+        wiersz, kolumna = kolejka.popleft() #pobiera pierwszy element
+
+        if wiersz < 0 or wiersz >= wysokosc or kolumna < 0 or kolumna >= szerokosc:
+            continue
+
+        if obraz[wiersz][kolumna]!= kolor_poczatkowy:
+            continue
+
+    #ustawiamy nowy kolor
+        obraz[wiersz][kolumna] = nowy_kolor
+
+    #dodajemy sąsiednie do kolejki
+        kolejka.append((wiersz -1, kolumna)) #góra
+        kolejka.append((wiersz +1, kolumna)) #dół
+        kolejka.append((wiersz, kolumna -1)) #lewo
+        kolejka.append((wiersz, kolumna +1)) #prawo
+
+
+
+flood_fill_bfs(obraz,0,0,2)
+
+print("-" *20)
+for wiersz in obraz:
+     print(wiersz)
 
